@@ -26,7 +26,12 @@ const Posts = () => {
                 setError(error); 
                 setLoading(false);
             });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const handleOpenPost = (id) => {
+        window.open(`/posts/${id}`, "_blank"); // Opens the new tab with the dynamic URL
+    };
 
     if (loading) return <div>Loading...</div>;
 
@@ -61,7 +66,7 @@ const Posts = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {posts.map(post => (
-                    <div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden" onClick={() => handleOpenPost(post.id)}>
 
                         <div className="relative">
                             <img src={post.image} alt={post.title} className="w-full h-48 object-cover" />
