@@ -1,45 +1,36 @@
-
+import { useState, useEffect } from "react";
+import { IoEye } from "react-icons/io5";
+import { MdDateRange } from "react-icons/md";
 
 const Posts = () => {
 
-    const posts = [
-        {
-            id: 1,
-            date: "December 24, 2024",
-            title: "Example Blog Post 1",
-            description: "Ante taciti nulla sit libero orci sed nam. Sagittis suspendisse gravida ornare iaculis cras nullam varius ac ullamcorper. Nunc euismod hendrerit netus ligula aptent potenti. Aliquam volutpat nibh scelerisque at...",
-            category: "Design",
-            image: "https://placehold.co/600x400?text=This+is+the+sign+you've+been+looking+for",
-            comments: 10
-        },
-        {
-            id: 2,
-            date: "December 23, 2024",
-            title: "Example Blog Post 2",
-            description: "Ante taciti nulla sit libero orci sed nam. Sagittis suspendisse gravida ornare iaculis cras nullam varius ac ullamcorper. Nunc euismod hendrerit netus ligula aptent potenti. Aliquam volutpat nibh scelerisque at...",
-            category: "UX/UI",
-            image: "https://placehold.co/600x400?text=Keyboard+and+Pens",
-            comments: 24
-        },
-        {
-            id: 3,
-            date: "December 24, 2024",
-            title: "Example Blog Post 3",
-            description: "Ante taciti nulla sit libero orci sed nam. Sagittis suspendisse gravida ornare iaculis cras nullam varius ac ullamcorper. Nunc euismod hendrerit netus ligula aptent potenti. Aliquam volutpat nibh scelerisque at...",
-            category: "Design",
-            image: "https://placehold.co/600x400?text=Laptop+and+Coffee",
-            comments: 43
-        },
-        {
-            id: 4,
-            date: "December 23, 2024",
-            title: "Example Blog Post 4",
-            description: "Ante taciti nulla sit libero orci sed nam. Sagittis suspendisse gravida ornare iaculis cras nullam varius ac ullamcorper. Nunc euismod hendrerit netus ligula aptent potenti. Aliquam volutpat nibh scelerisque at...",
-            category: "UX/UI",
-            image: "https://placehold.co/600x400?text=Passion+Led+Us+Here",
-            comments: 13
-        }
-    ];
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+
+    useEffect(() => {
+        fetch('https://jsonplaceholder.org/posts')
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then((data) => {
+                setPosts(data);
+                console.log("Posts", posts); 
+                setLoading(false); 
+            })
+            .catch((error) => {
+                setError(error); 
+                setLoading(false);
+            });
+    }, []);
+
+    if (loading) return <div>Loading...</div>;
+
+    if (error) return <div>Error: {error.message}</div>;
 
     return (
         <div className="px-6 mt-[30px]">
@@ -71,21 +62,42 @@ const Posts = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {posts.map(post => (
                     <div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                        <img src={post.image} alt={post.title} className="w-full h-48 object-cover" />
+
+                        <div className="relative">
+                            <img src={post.image} alt={post.title} className="w-full h-48 object-cover" />
+
+                            <div className="absolute top-2 right-2 flex items-center space-x-2 bg-[#FFFFFF] text-[#000000] rounded-[10px] p-2">
+                                <IoEye size={24} />
+                                <span className="text-sm">{post.id}</span>
+                            </div>
+                        </div>
+
+
                         <div className="p-4">
                             <div className="flex justify-between items-center mb-2">
-                                <span className="text-gray-500 text-sm"><i className="far fa-calendar-alt"></i> {post.date}</span>
-                                <span className="bg-gray-200 text-gray-700 text-xs font-semibold px-2 py-1 rounded">{post.category}</span>
+                                <span className="flex items-center text-gray-500 text-sm"><MdDateRange className="mr-1" />
+                                    {new Date(post.updatedAt).toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                    })}
+                                </span>
+                                <span className="bg-gray-200 text-gray-700 text-xs font-semibold px-2 py-1 rounded">{post.slug}</span>
                             </div>
                             <h2 className="text-xl font-bold mb-2">{post.title}</h2>
-                            <p className="text-gray-700 text-sm mb-4">{post.description} <a href="#" className="text-blue-500">Read More</a></p>
+                            <p className="text-gray-700 text-sm mb-4">
+                                {post.content.split(" ").slice(0, 50).join(" ")}...
+                                <a href="#" className="text-blue-500">Read More</a>
+                            </p>
                             <div className="flex justify-between items-center">
                                 <span className="text-gray-500 text-sm"><i className="far fa-comments"></i> {post.comments}</span>
                             </div>
                         </div>
+
                     </div>
                 ))}
             </div>
+
 
 
         </div>
