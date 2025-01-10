@@ -5,6 +5,8 @@ import { MdDateRange } from "react-icons/md";
 const Posts = () => {
 
     const [posts, setPosts] = useState([]);
+    const [filteredPosts, setFilteredPosts] = useState([]); 
+    const [searchTerm, setSearchTerm] = useState(""); 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -19,6 +21,7 @@ const Posts = () => {
             })
             .then((data) => {
                 setPosts(data);
+                setFilteredPosts(data);
                 console.log("Posts", posts); 
                 setLoading(false); 
             })
@@ -28,6 +31,19 @@ const Posts = () => {
             });
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const handleSearch = (e) => {
+        const term = e.target.value.toLowerCase();
+        setSearchTerm(term);
+    
+        const filtered = posts.filter(
+          (post) =>
+            post.title.toLowerCase().includes(term) ||
+            post.content.toLowerCase().includes(term)
+        );
+    
+        setFilteredPosts(filtered);
+    };
 
     const handleOpenPost = (id) => {
         window.open(`/posts/${id}`, "_blank"); // Opens the new tab with the dynamic URL
@@ -47,6 +63,8 @@ const Posts = () => {
                         type="text"
                         placeholder="Search ..."
                         className="border w-full h-full py-2 px-12 bg-[#F0F1F5] rounded-md"
+                        value={searchTerm}
+                        onChange={handleSearch}
                     />
                     <svg
                         width="20"
@@ -65,7 +83,7 @@ const Posts = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {posts.map(post => (
+                {filteredPosts.map(post => (
                     <div key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden" onClick={() => handleOpenPost(post.id)}>
 
                         <div className="relative">
